@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tic-Tac-Toe Game</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 font-sans">
+  <main class="max-w-4xl mx-auto p-6 bg-white shadow-lg rounded-lg my-8">
+    <h1 class="text-4xl font-bold text-blue-700 text-center mb-4">Tic-Tac-Toe</h1>
+    <p class="text-lg text-gray-600 mb-8 text-center">
+      Play a classic game of Tic-Tac-Toe! Players take turns placing X or O on the grid. The first to get three in a row wins.
+    </p>
+    <div class="text-center mb-4">
+      <p id="status" class="text-xl font-semibold text-gray-700">Player X's Turn</p>
+    </div>
+    <div class="grid grid-cols-3 gap-2 w-64 mx-auto mb-8">
+      <div class="cell bg-gray-200 h-16 flex items-center justify-center text-3xl font-bold cursor-pointer hover:bg-gray-300" data-index="0"></div>
+      <div class="cell bg-gray-200 h-16 flex items-center justify-center text-3xl font-bold cursor-pointer hover:bg-gray-300" data-index="1"></div>
+      <div class="cell bg-gray-200 h-16 flex items-center justify-center text-3xl font-bold cursor-pointer hover:bg-gray-300" data-index="2"></div>
+      <div class="cell bg-gray-200 h-16 flex items-center justify-center text-3xl font-bold cursor-pointer hover:bg-gray-300" data-index="3"></div>
+      <div class="cell bg-gray-200 h-16 flex items-center justify-center text-3xl font-bold cursor-pointer hover:bg-gray-300" data-index="4"></div>
+      <div class="cell bg-gray-200 h-16 flex items-center justify-center text-3xl font-bold cursor-pointer hover:bg-gray-300" data-index="5"></div>
+      <div class="cell bg-gray-200 h-16 flex items-center justify-center text-3xl font-bold cursor-pointer hover:bg-gray-300" data-index="6"></div>
+      <div class="cell bg-gray-200 h-16 flex items-center justify-center text-3xl font-bold cursor-pointer hover:bg-gray-300" data-index="7"></div>
+      <div class="cell bg-gray-200 h-16 flex items-center justify-center text-3xl font-bold cursor-pointer hover:bg-gray-300" data-index="8"></div>
+    </div>
+    <div class="text-center">
+      <button id="reset" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">Reset Game</button>
+    </div>
+    <!-- Modal for winner announcement -->
+    <div id="winnerModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center hidden">
+      <div class="bg-white p-6 rounded-lg shadow-lg text-center">
+        <h2 id="winnerMessage" class="text-2xl font-bold text-blue-700 mb-4"></h2>
+        <button id="closeModal" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">Close & Reset</button>
+      </div>
+    </div>
+  </main>
+  <script>
+    const cells = document.querySelectorAll('.cell');
+    const status = document.getElementById('status');
+    const resetButton = document.getElementById('reset');
+    const winnerModal = document.getElementById('winnerModal');
+    const winnerMessage = document.getElementById('winnerMessage');
+    const closeModal = document.getElementById('closeModal');
+    let board = ['', '', '', '', '', '', '', '', ''];
+    let currentPlayer = 'X';
+    let gameActive = true;
+
+    const winningCombinations = [
+      [0, 1, 2], [3, 4, 5], [6, 7, 8], // Rows
+      [0, 3, 6], [1, 4, 7], [2, 5, 8], // Columns
+      [0, 4, 8], [2, 4, 6] // Diagonals
+    ];
+
+    cells.forEach(cell => {
+      cell.addEventListener('click', () => handleCellClick(cell));
+    });
+
+    resetButton.addEventListener('click', resetGame);
+    closeModal.addEventListener('click', () => {
+      winnerModal.classList.add('hidden');
+      resetGame();
+    });
+
+    function handleCellClick(cell) {
+      const index = cell.getAttribute('data-index');
+      if (board[index] === '' && gameActive) {
+        board[index] = currentPlayer;
+        cell.textContent = currentPlayer;
+        if (checkWin()) {
+          status.textContent = `Player ${currentPlayer} Wins!`;
+          winnerMessage.textContent = `Player ${currentPlayer} Wins!`;
+          winnerModal.classList.remove('hidden');
+          cells.forEach(cell => cell.classList.remove('cursor-pointer', 'hover:bg-gray-300')); // Disable further clicks
+          gameActive = false;
+        } else if (board.every(cell => cell !== '')) {
+          status.textContent = "It's a Draw!";
+          winnerMessage.textContent = "It's a Draw!";
+          winnerModal.classList.remove('hidden');
+          cells.forEach(cell => cell.classList.remove('cursor-pointer', 'hover:bg-gray-300')); // Disable further clicks
+          gameActive = false;
+        } else {
+          currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+          status.textContent = `Player ${currentPlayer}'s Turn`;
+        }
+      }
+    }
+
+    function checkWin() {
+      return winningCombinations.some(combo => {
+        return combo.every(index => board[index] === currentPlayer);
+      });
+    }
+
+    function resetGame() {
+      board = ['', '', '', '', '', '', '', '', ''];
+      currentPlayer = 'X';
+      gameActive = true;
+      status.textContent = `Player ${currentPlayer}'s Turn`;
+      cells.forEach(cell => {
+        cell.textContent = '';
+        cell.classList.add('cursor-pointer', 'hover:bg-gray-300');
+      });
+      winnerModal.classList.add('hidden');
+    }
+  </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'95cf44033e49bd5e',t:'MTc1MjE0MjE2Ny4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('script');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
